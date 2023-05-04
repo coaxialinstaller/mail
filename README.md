@@ -1,1 +1,1 @@
-# mail
+pip install python-gnupg
