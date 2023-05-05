@@ -39,3 +39,78 @@ def send_mail(msg, subject, reciver):
 
     server.login(sender, sender_passwd)
     server.sendmail(sender, reciver, mail.as_string())
+    
+    
+    
+    
+    
+    
+    
+    
+from django.shortcuts import render, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+from cryptography.fernet import Fernet
+
+# Create your views here.
+
+
+import requests
+
+url = "http://127.0.0.1:8000"
+
+headers = {'Content-type': 'application/json'}
+
+data = '{"key": "Hej da-pojk!", "body": "bar", "userId": 1}'
+
+test = requests.post(url, data=data, headers=headers)
+
+print(test.text, test.status_code)
+
+
+@csrf_exempt
+def test(request):
+    suu = b'gAAAAABkVP99tg0jLEmuN4GfB1Eq-tzriOLGwcI9Y8B1IrCBdF6iCxEdgHXIYSzMWVBUNE-r25Fxn2TCRufKjsmnBOgRJMyzCA=='
+    key = b'bTFhhmfaGVyPN36i1k9qtFH-7hA6qUbZRlrmWVrFS_E='
+    k = Fernet(key)
+
+    token = k.encrypt(b"Hej da-pojk!")
+
+    print(token)
+    if request.method == "POST" and request.headers["Content-Type"] == "application/json":
+        print(json.loads(request.body))
+        print(json.loads(request.body)["key"])
+        print(k.decrypt(suu))
+        if k.decrypt(suu).decode("utf-8") == json.loads(request.body)["key"]:
+            print("GG!")
+            HttpResponse.status_code=200
+            return HttpResponse("Good")
+        
+    
+    
+
+    HttpResponse.status_code=404
+    return HttpResponse("Sike" + str(HttpResponse.status_code))
+
+
+class Person(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    birth_date = models.DateField()
+
+    def baby_boomer_status(self):
+        "Returns the person's baby-boomer status."
+        import datetime
+
+        if self.birth_date < datetime.date(1945, 8, 1):
+            return "Pre-boomer"
+        elif self.birth_date < datetime.date(1965, 1, 1):
+            return "Baby boomer"
+        else:
+            return "Post-boomer"
+
+    @property
+    def full_name(self):
+        "Returns the person's full name."
+        return f"{self.first_name} {self.last_name}"
