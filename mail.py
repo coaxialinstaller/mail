@@ -114,3 +114,27 @@ class Person(models.Model):
     def full_name(self):
         "Returns the person's full name."
         return f"{self.first_name} {self.last_name}"
+
+    
+    
+    
+    
+    
+    
+    
+    ###### SANITIZE PGP PUBLIC KEY ####
+
+        key_data = request.POST["a"]
+        goog = key_data.replace("-----BEGIN PGP PUBLIC KEY BLOCK----- ", "").replace("-----END PGP PUBLIC KEY BLOCK-----", "").split()
+        x = 0
+        while True:
+            if len(goog[x]) != 64:
+                goog.pop(x)
+            else:
+                break
+        goog.insert(0,"-----BEGIN PGP PUBLIC KEY BLOCK-----")
+        goog.insert(1, "")
+        goog.append("")
+        goog.append("-----END PGP PUBLIC KEY BLOCK-----")
+        key_data = "\n".join(goog)
+        print(key_data)
